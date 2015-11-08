@@ -1,4 +1,5 @@
 #!/bin/bash
+# NOTE TO SELF: grab a snack, script takes FOREVER to execute.
 
 aws rds-delete-db-subnet-group ITMO544-Database-Subnet
 
