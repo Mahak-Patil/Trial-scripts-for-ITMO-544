@@ -1,5 +1,6 @@
 #!/bin/bash
 # CAUTION: SCRIPT TAKES YEARS TO EXECUTE!
+# edit install-websever.sh path name
 # target of health check policy is currently "index.php"
 # all commands have hard coded values
 
@@ -22,17 +23,19 @@ for i in {0..60}
   sleep 1;
   done
   
-declare -a ARRAY 
-ARRAY=(`aws ec2 describe-instances --filters --output text Name=client-token,Values=$clientTkns | grep INSTANCES | awk {'print $8'}`)
-echo -e "\nListing Instances, filtering their instance-id, adding them to an ARRAY and sleeping 15 seconds"
-for i in {0..15}; do echo -ne '.'; sleep 1;done
-LENGTH=${#ARRAY[@]}
-echo "ARRAY LENGTH IS $LENGTH"
-for (( i=0; i<${#ARRAY[@]}; i++)); 
+  declare -a instance_list
+mapfile -t instance_list < <(aws ec2 run-instances --image-id $1 --count $2 --instance-type $3 --key-name $4 --security-group-ids $5 --subnet-id $6 --associate-public-ip-address --iam-instance-profile Name=$7 --user-data file://install-webserver.sh --output table | grep InstanceId | sed "s/|//g" | tr -d ' ' | sed "s/InstanceId//g")
+aws ec2 wait instance-running --instance-ids ${instance_list[@]} 
+aws ec2 wait instance-running --instance-ids ${instance_list[@]} 
+echo "Following instances running: ${instance_list[@]}" 
+echo "\nAdding above to an array and registering with the load balancer."
+ 
+len=${#instance_list[@]}
+for (( i=0; i<${#instance_list[@]}; i++)); 
   do
-  echo "Registering ${ARRAY[$i]} with load-balancer $1" 
-  aws elb register-instances-with-load-balancer --load-balancer-name $1 --instances ${ARRAY[$i]} --output=table 
-echo -e "\nLooping through instance array and registering each instance one at a time with the load-balancer.  Then sleeping 60 seconds to allow the process to finish."
+  echo "Registering ${instance_list[$i]} with load-balancer ITMO-544-Load-Balancer" 
+  aws elb register-instances-with-load-balancer --load-balancer-name ITMO-544-Load-Balancer --instances ${instance_list[$i]} --output=table 
+echo -e "\n Sleeping for one minute to complete the process."
     for y in {0..60} 
     do
       echo -ne '.'
