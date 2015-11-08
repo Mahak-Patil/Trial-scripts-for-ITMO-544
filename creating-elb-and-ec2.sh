@@ -1,6 +1,7 @@
 #!/bin/bash
 # CAUTION: SCRIPT TAKES YEARS TO EXECUTE!
-#target of health check policy is currently "index.php"
+# target of health check policy is currently "index.php"
+# all commands have hard coded values
 
 ElbUrl=$(aws elb create-load-balancer --load-balancer-name ITMO-544-Load-Balancer --security-groups sg-414a0a26 --subnets subnet-0fdfdd78 --listeners Protocol=HTTP,LoadBalancerPort=80,InstanceProtocol=HTTP,InstancePort=80 --output=text)
 echo "\nLaunched ELB and sleeping for one minute"
