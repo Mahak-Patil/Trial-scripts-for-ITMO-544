@@ -25,3 +25,12 @@ echo "\n"$DbSubnetID
 
 aws rds create-db-instance --db-instance-identifier ITMO-544-Database --allocated-storage 5 --db-instance-class db.t1.micro --engine mysql --master-username controller --master-user-password ilovebunnies --db-subnet-group-name ITMO544-Database-Subnet --db-name ITMO-Database > database.json
 
+echo "Sleeping for three minutes"
+for i in {0..180}
+do
+echo -ne '.'
+sleep 1
+done
+echo "Done sleeping!"
+
+aws rds create-db-instance-read-replica --db-instance-identifier ITMO-544-Read-Replica --source-db-instance-identifier ITMO-544-Database --output=text 
