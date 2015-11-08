@@ -12,14 +12,9 @@ for i in {0..60}
   done
 
 aws elb configure-health-check --load-balancer-name ITMO-544-Load-Balancer --health-check Target=HTTP:80/index.php,Interval=30,UnhealthyThreshold=2,HealthyThreshold=2,Timeout=3
-echo -e "\nConfigured ELB health check and sleeping for one minute"
-for i in {0..60}
- do
-  echo -ne '.'
-  sleep 1;
-  done
+echo -e "\nConfigured ELB health check. Proceeding to launch EC2 instances"
   
-aws ec2 run-instances --image-id ami-d05e75b8 --count 3 --instance-type t1.micro --key-name ITMO-544-Key-Pair.pem --user-data file://install-webserver.sh --subnet-id subnet-0fdfdd78 --output text --security-group-ids sg-414a0a26 --iam-instance-profile Name=phpDeveloper
+aws ec2 run-instances --image-id ami-d05e75b8 --count 3 --instance-type t2.micro --key-name ITMO-544-Key-Pair --user-data file://install-webserver.sh --subnet-id subnet-0fdfdd78 --output text --security-group-ids sg-414a0a26 --iam-instance-profile Name=phpDeveloper
 echo -e "\nLaunched 3 EC2 Instances and sleeping for one minute"
 for i in {0..60}
  do
